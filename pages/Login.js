@@ -34,16 +34,8 @@ const Login = () => {
       );
 
       if (data) {
-        // await AsyncStorage.setItem("token", data.token);
-        console.log("Token saved:", data.token);
-        // Get stored redirect path or default to home
-        // const redirectPath =
-        //   (await AsyncStorage.getItem("redirectAfterLogin")) || "Home";
-        // await AsyncStorage.removeItem("redirectAfterLogin");
-
-        // refreshProfile();
-
-        // navigation.navigate(redirectPath);
+        await AsyncStorage.setItem("userToken", data.token);
+        navigation.navigate("MainApp");
       }
     } catch (error) {
       showAlert(
