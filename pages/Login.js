@@ -21,7 +21,7 @@ const Login = () => {
   };
 
   const logIn = async () => {
-    if (email === "" || password === "") {
+    if (email === ""  || password === "") {
       showAlert("Please enter your email and password!");
       return;
     }
@@ -39,7 +39,7 @@ const Login = () => {
       }
     } catch (error) {
       showAlert(
-        error.response?.data?.error || "Login failed. Please try again."
+        error.response?.data?.error  || "Login failed. Please try again."
       );
       console.error("Login failed", error);
     }
