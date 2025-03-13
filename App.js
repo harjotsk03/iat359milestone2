@@ -19,7 +19,7 @@ function MainTabs() {
       <Tab.Screen
         name="Home"
         component={Home}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Profile"
