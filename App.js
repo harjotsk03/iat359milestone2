@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
-import Icon from 'react-native-ionicons'
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 // Import pages
 import Login from "./pages/Login";
@@ -18,14 +18,37 @@ function MainTabs() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="Home"
+        name="Spots"
         component={Home}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="cafe" color={color} size={16} />
+          ),
+          tabBarLabel: "Spots",
+        }}
       />
+      {/* <Tab.Screen
+        name="Community"
+        component={Profile}
+        options={{
+          headerShown: true,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="people" color={color} size={14} />
+          ),
+          tabBarLabel: "Community",
+        }}
+      /> */}
       <Tab.Screen
         name="Profile"
         component={Profile}
-        options={{ headerShown: true }}
+        options={{
+          headerShown: true,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person" color={color} size={14} />
+          ),
+          tabBarLabel: "Profile",
+        }}
       />
     </Tab.Navigator>
   );
