@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 12,
   },
   amenitiesRow: {

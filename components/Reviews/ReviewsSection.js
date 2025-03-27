@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 10,
   },
   reviewsContainer: {

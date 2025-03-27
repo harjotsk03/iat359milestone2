@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
+import * as Font from "expo-font";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,6 +20,21 @@ import { Ionicons } from "@expo/vector-icons";
 import studySpotrLogo from "../assets/studyspotrLogo.png";
 
 const Login = () => {
+  const loadFonts = useCallback(async () => {
+    await Font.loadAsync({
+      // Add your fonts here, for example:
+      "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+      "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
+      "Poppins-Light": require("../assets/fonts/Poppins-Light.ttf"),
+      "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
+    });
+    setFontsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    loadFonts();
+  }, [loadFonts]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -155,7 +171,7 @@ const Login = () => {
 
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
               <Text style={styles.signupLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
@@ -192,28 +208,30 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
     color: "#212529",
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: "Poppins-Regular",
     color: "#6c757d",
     marginBottom: 30,
     textAlign: "center",
   },
   inputContainer: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 4,
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f8f9fa",
-    borderRadius: 12,
+    borderRadius: 120,
     marginBottom: 16,
     paddingHorizontal: 15,
+    paddingLeft: 20,
     height: 55,
   },
   inputIcon: {
@@ -223,34 +241,32 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#212529",
+    fontFamily: "Poppins-Regular",
   },
   eyeIcon: {
     padding: 5,
   },
   forgotPassword: {
-    alignSelf: "flex-end",
+    alignSelf: "flex-start",
     marginBottom: 25,
+    marginTop: 0,
   },
   forgotPasswordText: {
     color: "#007bff",
-    fontSize: 14,
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
   },
   loginButton: {
     backgroundColor: "#007bff",
     paddingVertical: 15,
-    borderRadius: 12,
+    borderRadius: 120,
     alignItems: "center",
-    shadowColor: "#007bff",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-    marginBottom: 25,
+    marginBottom: 45,
   },
   loginButtonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontFamily: "Poppins-SemiBold",
   },
   signupContainer: {
     flexDirection: "row",
@@ -259,11 +275,12 @@ const styles = StyleSheet.create({
   signupText: {
     color: "#6c757d",
     fontSize: 14,
+    fontFamily: "Poppins-Regular",
   },
   signupLink: {
     color: "#007bff",
     fontSize: 14,
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
   },
 });
 
