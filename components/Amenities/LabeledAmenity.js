@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   amenityLabel: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 6,
     color: "#555",
   },
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 14,
     flexShrink: 1,
+    fontFamily: "Poppins-Medium",
     flexWrap: "wrap",
   },
 });

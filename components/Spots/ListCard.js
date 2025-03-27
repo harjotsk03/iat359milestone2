@@ -66,12 +66,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 8,
     color: "#333",
   },
   description: {
     fontSize: 13,
+    fontFamily: "Poppins-Regular",
     color: "#666",
     lineHeight: 20,
   },
@@ -82,6 +83,7 @@ const styles = StyleSheet.create({
   },
   hoursText: {
     marginLeft: 4,
+    fontFamily: "Poppins-Medium",
     fontSize: 13,
     color: "#666",
   },
@@ -96,7 +98,7 @@ const styles = StyleSheet.create({
   },
   moreInfoText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: "Poppins-Medium",
     color: "#4A90E2",
     marginRight: 4,
   },

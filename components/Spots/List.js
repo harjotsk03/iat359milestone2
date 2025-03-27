@@ -139,10 +139,10 @@ const styles = StyleSheet.create({
   },
   resultsText: {
     fontSize: 13,
-    fontWeight: "500",
+    fontFamily: "Poppins-Medium",
     color: "black",
     marginLeft: 20,
-    marginTop: 12,
+    marginTop: 2,
     paddingBottom: 10,
   },
   listContent: {

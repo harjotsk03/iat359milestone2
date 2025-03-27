@@ -18,6 +18,8 @@
     "@rnmapbox/maps": "^10.1.37",
     "axios": "^1.8.3",
     "expo": "~52.0.38",
+    "expo-font": "^13.0.4",
+    "expo-image-picker": "~16.0.6",
     "expo-linear-gradient": "^14.0.2",
     "expo-location": "^18.0.8",
     "expo-status-bar": "~2.0.1",

@@ -11,10 +11,14 @@ import {
   ScrollView,
   Image,
   Easing,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import useLocations from "../hooks/useLocations";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Import the List and Map components
 import List from "../components/Spots/List";
@@ -24,6 +28,7 @@ import ListCard from "../components/Spots/ListCard";
 // Import the AmenitiesSection component
 import AmenitiesSection from "../components/Amenities/AmenitiesSection";
 import ReviewsSection from "../components/Reviews/ReviewsSection";
+import RatingModal from "../components/Reviews/RatingModal.js";
 
 export default function Home() {
   const [showMap, setShowMap] = useState(false);
@@ -31,8 +36,26 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
-
+  const [userProfile, setUserProfile] = useState(null);
   const [drawerAnimation] = useState(new Animated.Value(0));
+  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
+
+  useEffect(() => {
+    // Load user profile data when component mounts
+    const loadUserProfile = async () => {
+      try {
+        const userProfileString = await AsyncStorage.getItem("userProfile");
+        if (userProfileString) {
+          const profile = JSON.parse(userProfileString);
+          setUserProfile(profile);
+        }
+      } catch (error) {
+        console.error("Failed to load user profile:", error);
+      }
+    };
+
+    loadUserProfile();
+  }, []);
 
   // Get all locations data
   const { locations, loading, error } = useLocations();
@@ -104,134 +127,185 @@ export default function Home() {
     outputRange: [600, 0],
   });
 
+  // Add this function to handle rating submission
+  const handleRatingSubmit = async (ratingData) => {
+    try {
+      const response = await axios.put(
+        `${process.env.EXPO_PUBLIC_API_URL}/addReview/${selectedLocation._id}`,
+        {
+          comment: ratingData.comment,
+          rating: ratingData.rating,
+          username: userProfile.username,
+          userId: userProfile._id,
+        }
+      );
+
+      setIsRatingModalVisible(false);
+
+      // Refresh the location data to show the new review
+      if (response.data.data) {
+        setSelectedLocation(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      Alert.alert(
+        "Error",
+        error.response?.data?.message ||
+          "Failed to submit review. Please try again."
+      );
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={styles.toggleOption}
-          onPress={() => toggleView()}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.toggleText, !showMap && styles.activeText]}>
-            List
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.toggleOption}
-          onPress={() => toggleView()}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.toggleText, showMap && styles.activeText]}>
-            Map
-          </Text>
-        </TouchableOpacity>
-
-        <Animated.View style={[styles.slider, { left: sliderPosition }]} />
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons
-          name="search"
-          size={16}
-          color="#888"
-          style={styles.searchIcon}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search locations..."
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          clearButtonMode="while-editing"
-        />
-        {searchTerm !== "" && (
-          <TouchableOpacity onPress={() => setSearchTerm("")}>
-            <Ionicons name="close-circle" size={16} color="#888" />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Custom List component with location selection handler */}
-      {showMap ? (
-        <Map
-          locations={filteredLocations}
-          onLocationSelect={handleLocationSelect}
-        />
-      ) : (
-        <List
-          locations={filteredLocations}
-          loading={loading}
-          error={error}
-          onLocationSelect={handleLocationSelect}
-        />
-      )}
-
-      {/* Location Details Drawer */}
-      {drawerVisible && (
-        <View style={styles.drawerOverlay}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <View style={styles.toggleContainer}>
           <TouchableOpacity
-            style={styles.drawerBackdrop}
-            activeOpacity={1}
-            onPress={closeDrawer}
-          />
-          <Animated.View
-            style={[
-              styles.drawer,
-              {
-                transform: [{ translateY: drawerTranslateY }],
-                opacity: drawerAnimation,
-              },
-            ]}
+            style={styles.toggleOption}
+            onPress={() => toggleView()}
+            activeOpacity={0.7}
           >
-            <TouchableOpacity style={styles.closeButton} onPress={closeDrawer}>
-              <Ionicons name="close" size={24} color="#ffffff" />
+            <Text style={[styles.toggleText, !showMap && styles.activeText]}>
+              List
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.toggleOption}
+            onPress={() => toggleView()}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.toggleText, showMap && styles.activeText]}>
+              Map
+            </Text>
+          </TouchableOpacity>
+
+          <Animated.View style={[styles.slider, { left: sliderPosition }]} />
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Ionicons
+            name="search"
+            size={16}
+            color="#888"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search locations..."
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            clearButtonMode="while-editing"
+          />
+          {searchTerm !== "" && (
+            <TouchableOpacity onPress={() => setSearchTerm("")}>
+              <Ionicons name="close-circle" size={16} color="#888" />
             </TouchableOpacity>
+          )}
+        </View>
 
-            {selectedLocation && (
-              <ScrollView style={styles.drawerContent}>
-                {selectedLocation.imageUrl && (
-                  <Image
-                    source={{ uri: selectedLocation.imageUrl }}
-                    style={styles.drawerImage}
-                    resizeMode="cover"
-                  />
-                )}
-                <View style={styles.drawerContentPadding}>
-                  <Text style={styles.drawerTitle}>
-                    {selectedLocation.name}
-                  </Text>
-                  <Text style={styles.drawerAddress}>
-                    {selectedLocation.spotLocationInfo.place_name ||
-                      `${selectedLocation.spotLocationInfo.city}, ${selectedLocation.spotLocationInfo.country}`}
-                  </Text>
+        {/* Custom List component with location selection handler */}
+        {showMap ? (
+          <Map
+            locations={filteredLocations}
+            onLocationSelect={handleLocationSelect}
+          />
+        ) : (
+          <List
+            locations={filteredLocations}
+            loading={loading}
+            error={error}
+            onLocationSelect={handleLocationSelect}
+          />
+        )}
 
-                  <View style={styles.locationInfo}>
-                    <Ionicons name="time-outline" size={16} color="#666" />
-                    <Text style={styles.hoursText}>
-                      {selectedLocation.openHours}
+        {/* Location Details Drawer */}
+        {drawerVisible && (
+          <View style={styles.drawerOverlay}>
+            <TouchableOpacity
+              style={styles.drawerBackdrop}
+              activeOpacity={1}
+              onPress={closeDrawer}
+            />
+            <Animated.View
+              style={[
+                styles.drawer,
+                {
+                  transform: [{ translateY: drawerTranslateY }],
+                  opacity: drawerAnimation,
+                },
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={closeDrawer}
+              >
+                <Ionicons name="close" size={24} color="#ffffff" />
+              </TouchableOpacity>
+
+              {selectedLocation && (
+                <ScrollView style={styles.drawerContent}>
+                  {selectedLocation.imageUrl && (
+                    <Image
+                      source={{ uri: selectedLocation.imageUrl }}
+                      style={styles.drawerImage}
+                      resizeMode="cover"
+                    />
+                  )}
+                  <View style={styles.drawerContentPadding}>
+                    <Text style={styles.drawerTitle}>
+                      {selectedLocation.name}
                     </Text>
-                  </View>
+                    <Text style={styles.drawerAddress}>
+                      {selectedLocation.spotLocationInfo.place_name ||
+                        `${selectedLocation.spotLocationInfo.city}, ${selectedLocation.spotLocationInfo.country}`}
+                    </Text>
 
-                  <AmenitiesSection location={selectedLocation} />
-
-                  {selectedLocation.description && (
-                    <View style={styles.descriptionContainer}>
-                      <Text style={styles.sectionTitle}>Description</Text>
-                      <Text style={styles.descriptionText}>
-                        {selectedLocation.description}
+                    <View style={styles.locationInfo}>
+                      <Ionicons name="time-outline" size={16} color="#666" />
+                      <Text style={styles.hoursText}>
+                        {selectedLocation.openHours}
                       </Text>
                     </View>
-                  )}
 
-                  <ReviewsSection location={selectedLocation} />
-                </View>
-              </ScrollView>
-            )}
-          </Animated.View>
-        </View>
-      )}
-    </View>
+                    <AmenitiesSection location={selectedLocation} />
+
+                    {selectedLocation.description && (
+                      <View style={styles.descriptionContainer}>
+                        <Text style={styles.sectionTitle}>Description</Text>
+                        <Text style={styles.descriptionText}>
+                          {selectedLocation.description}
+                        </Text>
+                      </View>
+                    )}
+
+                    <ReviewsSection location={selectedLocation} />
+                  </View>
+                </ScrollView>
+              )}
+              {selectedLocation?.createdById !== userProfile?._id && (
+                <TouchableOpacity
+                  style={styles.rateButton}
+                  onPress={() => setIsRatingModalVisible(true)}
+                >
+                  <Ionicons name="star" size={16} color="#ffffff" />
+                  <Text style={styles.rateText}>Rate this spot</Text>
+                </TouchableOpacity>
+              )}
+            </Animated.View>
+          </View>
+        )}
+
+        {/* Add the Rating Modal */}
+        <RatingModal
+          visible={isRatingModalVisible}
+          onClose={() => setIsRatingModalVisible(false)}
+          onSubmit={handleRatingSubmit}
+          locationId={selectedLocation?.id}
+        />
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -263,13 +337,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   toggleText: {
-    fontWeight: "600",
     color: "#888",
+    fontFamily: "Poppins-Medium",
     fontSize: 14,
   },
   activeText: {
     color: "#fff",
-    fontWeight: "700",
+    fontFamily: "Poppins-SemiBold",
   },
   slider: {
     position: "absolute",
@@ -287,7 +361,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f0f0f0",
-    borderRadius: 20,
+    borderRadius: 2000,
     marginBottom: 20,
     paddingHorizontal: 15,
     width: "90%",
@@ -299,6 +373,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 45,
+    fontFamily: "Poppins-Regular",
     fontSize: 16,
   },
   drawerOverlay: {
@@ -347,25 +422,27 @@ const styles = StyleSheet.create({
   },
   drawerTitle: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 8,
   },
   drawerAddress: {
     fontSize: 16,
     color: "#666",
     marginBottom: 16,
+    fontFamily: "Poppins-Regular",
   },
   hoursText: {
     marginLeft: 8,
     fontSize: 14,
     color: "#666",
+    fontFamily: "Poppins-Regular",
   },
   amenitiesContainer: {
     marginTop: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 12,
   },
   amenitiesRow: {
@@ -395,6 +472,7 @@ const styles = StyleSheet.create({
   },
   amenityText: {
     marginLeft: 8,
+    fontFamily: "Poppins-Regular",
     fontSize: 14,
     flexShrink: 1,
     flexWrap: "wrap",
@@ -424,7 +502,7 @@ const styles = StyleSheet.create({
   },
   amenityLabel: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
     marginBottom: 6,
     color: "#555",
   },
@@ -446,5 +524,28 @@ const styles = StyleSheet.create({
     top: 10,
     padding: 5,
     right: 10,
+  },
+  rateText: {
+    fontFamily: "Poppins-Medium",
+    fontSize: 14,
+    color: "white",
+  },
+  rateButton: {
+    backgroundColor: "#007BFF",
+    borderRadius: 1000,
+    padding: 10,
+    alignItems: "center",
+    position: "absolute",
+    width: "95%",
+    gap: 10,
+    height: 40,
+    flexDirection: "row",
+    marginLeft: 10,
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 10,
+    left: 0,
+    right: 0,
   },
 });

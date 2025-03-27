@@ -99,16 +99,17 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
     color: "#757575",
   },
   username: {
-    fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
     fontSize: 14,
   },
   timestamp: {
     color: "#757575",
     fontSize: 12,
+    fontFamily: "Poppins-Regular",
   },
   starsContainer: {
     flexDirection: "row",
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 12,
+    fontFamily: "Poppins-Medium",
   },
   ratingContainer: {
     alignSelf: "flex-start",
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   ratingText: {
-    fontWeight: "bold",
+    fontFamily: "Poppins-Regular",
     color: "#555",
   },
 });

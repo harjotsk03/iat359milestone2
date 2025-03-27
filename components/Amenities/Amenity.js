@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flexShrink: 1,
     flexWrap: "wrap",
+    fontFamily: "Poppins-Medium",
   },
 });
 
