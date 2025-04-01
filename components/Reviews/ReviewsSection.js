@@ -6,12 +6,16 @@ export default function ReviewsSection({ location }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Reviews</Text>
-      <View style={styles.reviewsContainer}>
-        {location.comments &&
-          location.comments.map((item) => (
-            <ReviewCard key={item._id} review={item} />
-          ))}
-      </View>
+      {location.comments.length > 0 ? (
+        <View style={styles.reviewsContainer}>
+          {location.comments &&
+            location.comments.map((item) => (
+              <ReviewCard key={item._id} review={item} />
+            ))}
+        </View>
+      ) : (
+        <Text style={styles.noReviews}>No reviews yet</Text>
+      )}
     </View>
   );
 }
@@ -27,5 +31,11 @@ const styles = StyleSheet.create({
   },
   reviewsContainer: {
     gap: 10,
+  },
+  noReviews: {
+    fontFamily: "Poppins-Regular",
+    fontSize: 16,
+    color: "#666",
+    paddingBottom: 20,
   },
 });

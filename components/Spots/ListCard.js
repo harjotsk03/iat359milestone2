@@ -13,6 +13,12 @@ const ListCard = ({ location, onPress }) => {
         />
       )}
       <View style={styles.contentContainer}>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.ratingText}>
+            Rating: {location.rating}
+            <Text style={styles.star}>★</Text>({location.ratingCount})
+          </Text>
+        </View>
         <Text style={styles.title}>{location.name}</Text>
         <Text style={styles.description}>
           {location.spotLocationInfo.city}, {location.spotLocationInfo.country}
@@ -101,6 +107,20 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Medium",
     color: "#4A90E2",
     marginRight: 4,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  ratingText: {
+    fontFamily: "Poppins-Medium",
+    fontSize: 14,
+    color: "#666",
+  },
+  star: {
+    fontSize: 16,
+    color: "#FFD700",
   },
 });
 
