@@ -1,3 +1,17 @@
+/**
+ * Register Component
+ *
+ * A React Native component that handles user registration functionality.
+ * Features include:
+ * - Form validation for user inputs
+ * - Password strength requirements
+ * - Real-time password matching
+ * - Animated error messages
+ * - Social media profile linking (optional)
+ *
+ * @component
+ * @returns {JSX.Element} The rendered Register component
+ */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
@@ -21,6 +35,10 @@ import { Ionicons } from "@expo/vector-icons";
 import studySpotrLogo from "../assets/studyspotrLogo.png";
 
 const Register = () => {
+  /**
+   * Loads custom fonts required for the component
+   * Uses Poppins font family with different weights
+   */
   const loadFonts = useCallback(async () => {
     await Font.loadAsync({
       // Add your fonts here, for example:
@@ -36,6 +54,7 @@ const Register = () => {
     loadFonts();
   }, [loadFonts]);
 
+  // State management for form inputs and UI states
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -46,20 +65,26 @@ const Register = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [showPasswordRequirements, setShowPasswordRequirements] =
     useState(false);
+
+  // Password requirements state
   const [passwordRequirements, setPasswordRequirements] = useState({
     uppercase: false,
     lowercase: false,
     number: false,
     special: false,
   });
+
+  // Error handling and animation states
   const [errorMessage, setErrorMessage] = useState("");
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-20)).current;
 
+  // Effect to check password matching in real-time
   useEffect(() => {
     setPasswordsMatch(password === confirmPassword);
   }, [password, confirmPassword]);
 
+  // Effect to validate password requirements in real-time
   useEffect(() => {
     setPasswordRequirements({
       uppercase: /[A-Z]/.test(password),
@@ -71,10 +96,19 @@ const Register = () => {
 
   const navigation = useNavigation();
 
+  /**
+   * Displays an alert message to the user
+   * @param {string} message - The message to display in the alert
+   */
   const showAlert = (message) => {
     Alert.alert("Alert", message);
   };
 
+  /**
+   * Fetches the user's profile data from the API
+   * @param {string} token - The authentication token
+   * @returns {Promise<Object|null>} The user's profile data or null if fetch fails
+   */
   const getProfile = async (token) => {
     try {
       const response = await axios.get(
@@ -96,6 +130,10 @@ const Register = () => {
     }
   };
 
+  /**
+   * Shows an animated error modal with the given message
+   * @param {string} message - The error message to display
+   */
   const showErrorModal = (message) => {
     setErrorMessage(message);
     Animated.parallel([
@@ -117,6 +155,9 @@ const Register = () => {
     }, 3000);
   };
 
+  /**
+   * Hides the error modal with animation
+   */
   const hideErrorModal = () => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -132,6 +173,10 @@ const Register = () => {
     ]).start();
   };
 
+  /**
+   * Validates all form inputs before submission
+   * @returns {boolean} True if all validations pass, false otherwise
+   */
   const validateInputs = () => {
     if (!fullName.trim()) {
       showErrorModal("Please enter your full name");
@@ -160,6 +205,13 @@ const Register = () => {
     return true;
   };
 
+  /**
+   * Handles the registration process
+   * - Validates inputs
+   * - Makes API call to register user
+   * - Stores user data in AsyncStorage
+   * - Navigates to main app on success
+   */
   const register = async () => {
     if (!validateInputs()) return;
 
@@ -437,6 +489,10 @@ const Register = () => {
   );
 };
 
+/**
+ * Styles for the Register component
+ * Uses a clean, modern design with consistent spacing and colors
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

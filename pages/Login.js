@@ -1,3 +1,16 @@
+/**
+ * Login Component
+ *
+ * A React Native component that handles user authentication through email and password.
+ * Features include:
+ * - Email and password input with validation
+ * - Show/hide password functionality
+ * - Custom font loading
+ * - API integration for authentication
+ * - Profile data fetching and storage
+ * - Navigation to registration and main app
+ */
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -20,9 +33,15 @@ import { Ionicons } from "@expo/vector-icons";
 import studySpotrLogo from "../assets/studyspotrLogo.png";
 
 const Login = () => {
+  // State for font loading
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  /**
+   * Loads custom fonts required for the application
+   * Uses useCallback to memoize the function
+   */
   const loadFonts = useCallback(async () => {
     await Font.loadAsync({
-      // Add your fonts here, for example:
       "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
       "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
       "Poppins-Light": require("../assets/fonts/Poppins-Light.ttf"),
@@ -31,19 +50,30 @@ const Login = () => {
     setFontsLoaded(true);
   }, []);
 
+  // Load fonts when component mounts
   useEffect(() => {
     loadFonts();
   }, [loadFonts]);
 
+  // Form state management
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
+  /**
+   * Displays an alert message to the user
+   * @param {string} message - The message to display in the alert
+   */
   const showAlert = (message) => {
     Alert.alert("Alert", message);
   };
 
+  /**
+   * Fetches and stores the user's profile data
+   * @param {string} token - The authentication token
+   * @returns {Promise<Object|null>} The user profile data or null if fetch fails
+   */
   const getProfile = async (token) => {
     try {
       const response = await axios.get(
@@ -55,7 +85,7 @@ const Login = () => {
         }
       );
 
-      // Store user profile in AsyncStorage
+      // Store user profile in AsyncStorage for persistence
       await AsyncStorage.setItem("userProfile", JSON.stringify(response.data));
       return response.data;
     } catch (error) {
@@ -65,6 +95,14 @@ const Login = () => {
     }
   };
 
+  /**
+   * Handles the login process
+   * - Validates input fields
+   * - Makes API call to authenticate user
+   * - Stores authentication token
+   * - Fetches and stores user profile
+   * - Navigates to main app on success
+   */
   const logIn = async () => {
     if (email === "" || password === "") {
       showAlert("Please enter your email and password!");
@@ -79,11 +117,13 @@ const Login = () => {
       );
 
       if (data) {
+        // Store authentication token
         await AsyncStorage.setItem("userToken", data.token);
 
-        // Fetch and store user profile after successful login
+        // Fetch and store user profile
         const userProfile = await getProfile(data.token);
 
+        // Navigate to main app
         navigation.navigate("MainApp");
       }
     } catch (error) {
@@ -101,6 +141,7 @@ const Login = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
       >
+        {/* Logo Section */}
         <View style={styles.logoContainer}>
           <Image
             source={studySpotrLogo}
@@ -109,11 +150,14 @@ const Login = () => {
           />
         </View>
 
+        {/* Login Form Section */}
         <View style={styles.formContainer}>
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue</Text>
 
+          {/* Input Fields */}
           <View style={styles.inputContainer}>
+            {/* Email Input */}
             <View style={styles.inputWrapper}>
               <Ionicons
                 name="mail-outline"
@@ -132,6 +176,7 @@ const Login = () => {
               />
             </View>
 
+            {/* Password Input */}
             <View style={styles.inputWrapper}>
               <Ionicons
                 name="lock-closed-outline"
@@ -161,14 +206,17 @@ const Login = () => {
             </View>
           </View>
 
+          {/* Forgot Password Link */}
           <TouchableOpacity style={styles.forgotPassword}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
 
+          {/* Login Button */}
           <TouchableOpacity style={styles.loginButton} onPress={logIn}>
             <Text style={styles.loginButtonText}>Sign In</Text>
           </TouchableOpacity>
 
+          {/* Sign Up Link */}
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate("Register")}>
@@ -181,6 +229,10 @@ const Login = () => {
   );
 };
 
+/**
+ * Styles for the Login component
+ * Uses a clean, modern design with consistent spacing and colors
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

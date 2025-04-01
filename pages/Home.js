@@ -1,3 +1,19 @@
+/**
+ * Home.js - Main Screen Component
+ *
+ * This component serves as the primary interface for the application's location-based features.
+ * It provides a dual-view interface (List/Map) for displaying coffee spots/study locations,
+ * along with detailed information about each location.
+ *
+ * Features:
+ * - Toggle between List and Map views
+ * - Search functionality for locations
+ * - Location details drawer with amenities and reviews
+ * - Rating system for locations
+ *
+ * @component
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
@@ -31,17 +47,24 @@ import ReviewsSection from "../components/Reviews/ReviewsSection";
 import RatingModal from "../components/Reviews/RatingModal.js";
 
 export default function Home() {
-  const [showMap, setShowMap] = useState(false);
-  const [animation] = useState(new Animated.Value(0));
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [userProfile, setUserProfile] = useState(null);
-  const [drawerAnimation] = useState(new Animated.Value(0));
-  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
+  /**
+   * State Management
+   */
+  const [showMap, setShowMap] = useState(false); // Controls view mode (List/Map)
+  const [animation] = useState(new Animated.Value(0)); // Animation value for view toggle
+  const [searchTerm, setSearchTerm] = useState(""); // Search input value
+  const [selectedLocation, setSelectedLocation] = useState(null); // Currently selected location
+  const [drawerVisible, setDrawerVisible] = useState(false); // Controls drawer visibility
+  const [userProfile, setUserProfile] = useState(null); // Logged in user's profile
+  const [drawerAnimation] = useState(new Animated.Value(0)); // Drawer animation value
+  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false); // Rating modal visibility
 
+  /**
+   * Effects
+   */
+
+  // Load user profile on component mount
   useEffect(() => {
-    // Load user profile data when component mounts
     const loadUserProfile = async () => {
       try {
         const userProfileString = await AsyncStorage.getItem("userProfile");
@@ -53,14 +76,23 @@ export default function Home() {
         console.error("Failed to load user profile:", error);
       }
     };
-
     loadUserProfile();
   }, []);
 
-  // Get all locations data
+  // Get locations data using custom hook
   const { locations, loading, error } = useLocations();
 
-  // Filter locations based on search term
+  /**
+   * Location Filtering
+   * Filters locations based on search term, checking against multiple criteria:
+   * - Name
+   * - Key
+   * - Place name
+   * - City
+   * - Country
+   * - Amenities (wifi, outlets)
+   * - Opening hours
+   */
   const filteredLocations = locations.filter((location) => {
     if (searchTerm === "") return true;
 
@@ -82,6 +114,10 @@ export default function Home() {
     );
   });
 
+  /**
+   * View Toggle Animation
+   * Handles the animation between List and Map views
+   */
   const toggleView = () => {
     const toValue = showMap ? 0 : 1;
 
@@ -100,6 +136,10 @@ export default function Home() {
     outputRange: [4, 76],
   });
 
+  /**
+   * Drawer Management
+   * Functions to handle the location details drawer
+   */
   const handleLocationSelect = (location) => {
     setSelectedLocation(location);
     setDrawerVisible(true);
@@ -127,7 +167,10 @@ export default function Home() {
     outputRange: [600, 0],
   });
 
-  // Add this function to handle rating submission
+  /**
+   * Rating Submission
+   * Handles the submission of user ratings for locations
+   */
   const handleRatingSubmit = async (ratingData) => {
     console.log("Starting handleRatingSubmit function");
 
@@ -227,7 +270,7 @@ export default function Home() {
           )}
         </View>
 
-        {/* Custom List component with location selection handler */}
+        {/* Main Content - Map or List */}
         {showMap ? (
           <Map
             locations={filteredLocations}

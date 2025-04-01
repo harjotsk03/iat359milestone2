@@ -1,3 +1,4 @@
+// Required React and Navigation imports
 import React, { useState, useEffect, useCallback } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -6,16 +7,21 @@ import { StatusBar } from "expo-status-bar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Font from "expo-font";
 
-// Import pages
+// Import application pages/screens
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 
+// Initialize navigation containers
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Add this function to handle authentication flow
+/**
+ * AuthStack - Handles the authentication flow of the application
+ * Contains Login and Register screens in a stack navigation
+ * @returns Stack Navigator component with auth screens
+ */
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -25,10 +31,15 @@ function AuthStack() {
   );
 }
 
-// This component will be shown after login
+/**
+ * MainTabs - Main navigation tabs shown after user authentication
+ * Contains Spots (Home) and Profile screens in a bottom tab navigation
+ * @returns Tab Navigator component with main app screens
+ */
 function MainTabs() {
   return (
     <Tab.Navigator>
+      {/* Spots Tab - Shows coffee spots/locations */}
       <Tab.Screen
         name="Spots"
         component={Home}
@@ -43,17 +54,7 @@ function MainTabs() {
           },
         }}
       />
-      {/* <Tab.Screen
-        name="Community"
-        component={Profile}
-        options={{
-          headerShown: true,
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="people" color={color} size={14} />
-          ),
-          tabBarLabel: "Community",
-        }}
-      /> */}
+      {/* Profile Tab - Shows user profile information */}
       <Tab.Screen
         name="Profile"
         component={Profile}
@@ -72,9 +73,19 @@ function MainTabs() {
   );
 }
 
+/**
+ * App - Root component of the application
+ * Handles font loading and main navigation structure
+ * @returns The main application component
+ */
 export default function App() {
+  // State to track if custom fonts are loaded
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
+  /**
+   * loadFonts - Loads custom Poppins font family variants
+   * Uses expo-font to load font files from assets
+   */
   const loadFonts = useCallback(async () => {
     await Font.loadAsync({
       "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
@@ -85,16 +96,20 @@ export default function App() {
     setFontsLoaded(true);
   }, []);
 
+  // Load fonts when component mounts
   useEffect(() => {
     loadFonts();
   }, [loadFonts]);
 
+  // Show nothing until fonts are loaded
   if (!fontsLoaded) {
     return null; // Or return a loading spinner
   }
 
+  // Main app structure with navigation container
   return (
     <NavigationContainer>
+      {/* Main stack navigator containing Auth and MainApp screens */}
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Auth" component={AuthStack} />
         <Stack.Screen name="MainApp" component={MainTabs} />
