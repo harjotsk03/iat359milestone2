@@ -129,15 +129,37 @@ export default function Home() {
 
   // Add this function to handle rating submission
   const handleRatingSubmit = async (ratingData) => {
+    console.log("Starting handleRatingSubmit function");
+
+    if (!selectedLocation) {
+      console.error("selectedLocation is undefined");
+      return;
+    }
+    if (!userProfile) {
+      console.error("userProfile is undefined");
+      return;
+    }
+
+    console.log("ratingData:", ratingData);
+    console.log("selectedLocation:", selectedLocation);
+    console.log("userProfile:", userProfile);
+
     try {
+      // Create request body with required fields
+      const requestBody = {
+        rating: ratingData.rating,
+        username: userProfile.username,
+        userId: userProfile._id,
+      };
+
+      // Only add comment to request body if it exists and is not empty
+      if (ratingData.comment && ratingData.comment.trim()) {
+        requestBody.comment = ratingData.comment;
+      }
+
       const response = await axios.put(
-        `${process.env.EXPO_PUBLIC_API_URL}/addReview/${selectedLocation._id}`,
-        {
-          comment: ratingData.comment,
-          rating: ratingData.rating,
-          username: userProfile.username,
-          userId: userProfile._id,
-        }
+        `${process.env.EXPO_PUBLIC_API_URL}/locations/addReview/${selectedLocation._id}`,
+        requestBody
       );
 
       setIsRatingModalVisible(false);
@@ -254,6 +276,13 @@ export default function Home() {
                     />
                   )}
                   <View style={styles.drawerContentPadding}>
+                    <View style={styles.ratingContainer}>
+                      <Text style={styles.ratingText}>
+                        Rating: {selectedLocation.rating}
+                        <Text style={styles.star}>★</Text>(
+                        {selectedLocation.ratingCount})
+                      </Text>
+                    </View>
                     <Text style={styles.drawerTitle}>
                       {selectedLocation.name}
                     </Text>
@@ -547,5 +576,21 @@ const styles = StyleSheet.create({
     bottom: 10,
     left: 0,
     right: 0,
+  },
+  ratingText: {
+    fontFamily: "Poppins-Medium",
+    fontSize: 14,
+    color: "black",
+  },
+  star: {
+    fontSize: 16,
+    color: "#FFD700",
+    marginLeft: 5,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 10,
   },
 });
